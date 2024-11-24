@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "camelcase": [
+      "error",
+      {
+        "properties": "never",
+        "ignoreDestructuring": true,
+        "allow": ["customer_id"]
+      }
+    ]
+  },
+  "extends": [
+    "@rocketseat/eslint-config/node"
+  ]
+}
