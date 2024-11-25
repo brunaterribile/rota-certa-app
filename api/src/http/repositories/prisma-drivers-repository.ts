@@ -18,4 +18,14 @@ export class PrismaDriversRepository {
 
     return drivers
   }
+
+  async findById(id: string) {
+    const driver = await prisma.driver.findUnique({
+      where: { id },
+    })
+
+    if (!driver) return null
+
+    return driver
+  }
 }

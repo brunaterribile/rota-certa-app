@@ -1,6 +1,11 @@
-import { EstimateRideBody } from '../controllers/ride-controller'
+import {
+  ConfirmRideBody,
+  EstimateRideBody,
+} from '../controllers/ride-controller'
 import axios from 'axios'
 import { PrismaDriversRepository } from '../repositories/prisma-drivers-repository'
+import { PrismaRidesRepository } from '../repositories/prisma-rides-repository'
+import { PrismaUsersRepository } from '../repositories/prisma-users-repository'
 
 export async function estimateRideService({
   origin,
@@ -36,11 +41,9 @@ export async function estimateRideService({
     }
 
     const distanceInKm = route.distanceMeters / 1000
-    const durationInMinutes = Math.ceil(
-      parseInt(route.duration.replace('s', ''), 10) / 60,
-    )
-    const prismaUsersRepository = new PrismaDriversRepository()
-    const drivers = await prismaUsersRepository.findDrivers(distanceInKm)
+
+    const prismaDriversRepository = new PrismaDriversRepository()
+    const drivers = await prismaDriversRepository.findDrivers(distanceInKm)
 
     const formatDrivers = drivers.map((driver) => {
       return {
@@ -59,16 +62,54 @@ export async function estimateRideService({
     return {
       origin: route.legs[0].startLocation.latLng,
       destination: route.legs[0].endLocation.latLng,
-      distance: distanceInKm.toFixed(2),
-      duration: durationInMinutes,
+      distance: distanceInKm,
+      duration: route.duration,
       options: formatDrivers,
       routeResponse: route,
     }
   } catch (error) {
-    console.error(
-      'Erro ao calcular a rota:',
-      error.response?.data || error.message,
-    )
+    console.error('Erro ao calcular a rota:', error)
     throw new Error('Erro ao calcular a rota.')
   }
+}
+
+export async function confirmRideService({
+  customer_id,
+  origin,
+  destination,
+  distance,
+  duration,
+  driver,
+  value,
+}: ConfirmRideBody): Promise<boolean> {
+  const prismaDriversRepository = new PrismaDriversRepository()
+  const driverData = await prismaDriversRepository.findById(String(driver.id))
+
+  if (!driverData) {
+    throw new Error('Motorista não encontrado.')
+  }
+
+  if (driverData.min_distance > distance) {
+    throw new Error('Este motorista não aceita a distância informada.')
+  }
+
+  const prismaUserRepository = new PrismaUsersRepository()
+  const userExist = await prismaUserRepository.findById(customer_id)
+
+  if (!userExist) {
+    await prismaUserRepository.createUser({ id: customer_id })
+  }
+
+  const prismaRidesRepository = new PrismaRidesRepository()
+  await prismaRidesRepository.createRide({
+    user: { connect: { id: customer_id } },
+    driver: { connect: { id: String(driver.id) } },
+    origin,
+    destination,
+    distance,
+    duration,
+    value,
+  })
+
+  return true
 }
