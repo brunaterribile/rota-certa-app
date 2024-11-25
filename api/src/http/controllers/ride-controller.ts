@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import {
   confirmRideService,
   estimateRideService,
+  getRidesService,
 } from '../services/ride-service'
 
 export interface EstimateRideBody {
@@ -121,6 +122,36 @@ export async function confirmRide(
     return res.status(400).send({
       error_code: 'CONFIRMATION_FAILED',
       error_description: 'Algo deu errado ao confirmar a corrida.',
+    })
+  }
+}
+
+export async function getRides(
+  req: FastifyRequest<{
+    Params: { customer_id: string }
+    Querystring: { driver_id?: string }
+  }>,
+  res: FastifyReply,
+) {
+  const { customer_id } = req.params
+  const { driver_id } = req.query
+
+  if (!customer_id) {
+    return res.status(400).send({
+      error_code: 'INVALID_DATA',
+      error_description: 'ID do usuário é obrigatório.',
+    })
+  }
+
+  try {
+    const rides = await getRidesService(customer_id, driver_id)
+
+    return res.status(200).send(rides)
+  } catch (error) {
+    console.error(error)
+    return res.status(400).send({
+      error_code: 'CONFIRMATION_FAILED',
+      error_description: 'Algo deu errado ao buscar corridas.',
     })
   }
 }

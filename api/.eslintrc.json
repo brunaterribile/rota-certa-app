@@ -5,7 +5,7 @@
       {
         "properties": "never",
         "ignoreDestructuring": true,
-        "allow": ["customer_id"]
+        "allow": ["customer_id", "driver_id"]
       }
     ]
   },

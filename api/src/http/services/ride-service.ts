@@ -113,3 +113,40 @@ export async function confirmRideService({
 
   return true
 }
+
+export async function getRidesService(customer_id: string, driver_id?: string) {
+  if (driver_id) {
+    const prismaDriversRepository = new PrismaDriversRepository()
+    const driverData = await prismaDriversRepository.findById(driver_id)
+
+    if (!driverData) {
+      throw new Error('Motorista inválido.')
+    }
+  }
+
+  const prismaRidesRepository = new PrismaRidesRepository()
+  const rides = await prismaRidesRepository.findMany({
+    user_id: customer_id,
+    ...(driver_id ? { driver_id } : {}),
+  })
+
+  if (rides.length === 0) {
+    throw new Error('Nenhuma corrida encontrada.')
+  }
+
+  return {
+    customer_id,
+    rides: rides.map((ride) => {
+      return {
+        id: ride.id,
+        date: ride.date,
+        origin: ride.origin,
+        destination: ride.destination,
+        distance: ride.distance,
+        duration: ride.duration,
+        driver: ride.driver,
+        value: ride.value,
+      }
+    }),
+  }
+}
