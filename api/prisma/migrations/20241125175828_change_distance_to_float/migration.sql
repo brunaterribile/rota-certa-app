@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "rides" ALTER COLUMN "distance" SET DATA TYPE DOUBLE PRECISION;

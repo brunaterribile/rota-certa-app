@@ -1,13 +1,7 @@
 {
   "rules": {
-    "camelcase": [
-      "error",
-      {
-        "properties": "never",
-        "ignoreDestructuring": true,
-        "allow": ["customer_id", "driver_id"]
-      }
-    ]
+    "camelcase": "off",
+    "no-useless-constructor": "off"
   },
   "extends": [
     "@rocketseat/eslint-config/node"
