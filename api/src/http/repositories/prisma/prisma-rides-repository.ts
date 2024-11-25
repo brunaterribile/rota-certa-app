@@ -1,14 +1,24 @@
 import { prisma } from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import { Driver, Prisma, Ride } from '@prisma/client'
+import { RidesRepository } from '../rides-repository'
 
-export class PrismaRidesRepository {
-  async createRide(data: Prisma.RideCreateInput) {
+export interface RideFilter {
+  user_id: number
+  driver_id?: number
+}
+
+export interface RidesWithDrivers extends Ride {
+  driver: Partial<Driver> | null
+}
+
+export class PrismaRidesRepository implements RidesRepository {
+  async createRide(data: Prisma.RideCreateInput): Promise<void> {
     await prisma.ride.create({
       data,
     })
   }
 
-  async findMany(filter: { user_id: string; driver_id?: string }) {
+  async findMany(filter: RideFilter): Promise<RidesWithDrivers[]> {
     const rides = await prisma.ride.findMany({
       where: {
         user_id: filter.user_id,

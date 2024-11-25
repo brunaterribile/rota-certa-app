@@ -1,12 +1,21 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import {
-  confirmRideService,
-  estimateRideService,
-  getRidesService,
+  ConfirmRideUseCase,
+  EstimateRideUseCase,
+  GetRidesUseCase,
 } from '../services/ride-service'
+import { PrismaDriversRepository } from '../repositories/prisma/prisma-drivers-repository'
+import { PrismaRidesRepository } from '../repositories/prisma/prisma-rides-repository'
+import { PrismaUsersRepository } from '../repositories/prisma/prisma-users-repository'
+import { sendErrorResponse } from '../utils/send-error-response'
+import { validateRideBody } from '../utils/validate-ride-body'
+import { DriverNotFoundError } from '../services/errors/driver-not-found-error'
+import { InvalidDistanceError } from '../services/errors/invalid-distance-error'
+import { InvalidDriverError } from '../services/errors/invalid-driver-error'
+import { NoRidesFoundError } from '../services/errors/no-rides-found-error'
 
 export interface EstimateRideBody {
-  customer_id: string
+  customer_id: number
   origin: string
   destination: string
 }
@@ -16,7 +25,7 @@ interface Driver {
   name: string
 }
 export interface ConfirmRideBody {
-  customer_id: string
+  customer_id: number
   origin: string
   destination: string
   distance: number
@@ -29,40 +38,26 @@ export async function estimateRide(
   req: FastifyRequest<{ Body: EstimateRideBody }>,
   res: FastifyReply,
 ) {
-  const { customer_id, origin, destination } = req.body
+  const { origin, destination } = req.body
 
-  if (!origin || !destination) {
-    return res.status(400).send({
-      error_code: 'INVALID_DATA',
-      error_description:
-        'Os endereços de origem e de destino são obrigatórios.',
-    })
-  }
+  const validationError = validateRideBody(req.body)
 
-  if (!customer_id) {
-    return res.status(400).send({
-      error_code: 'INVALID_DATA',
-      error_description: 'ID do usuário é obrigatório.',
-    })
-  }
-
-  if (origin === destination) {
-    return res.status(400).send({
-      error_code: 'INVALID_DATA',
-      error_description:
-        'Os endereços de origem e de destino não podem ser iguais.',
-    })
+  if (validationError) {
+    return sendErrorResponse(res, 400, 'INVALID_DATA', validationError)
   }
 
   try {
-    const estimation = await estimateRideService({
+    const prismaDriversRepository = new PrismaDriversRepository()
+    const estimateRideUseCase = new EstimateRideUseCase(prismaDriversRepository)
+
+    const estimation = await estimateRideUseCase.execute({
       origin,
       destination,
     })
 
     return res.status(200).send(estimation)
   } catch (error) {
-    return res.status(400).send(error)
+    return res.status(500).send(error)
   }
 }
 
@@ -80,31 +75,23 @@ export async function confirmRide(
     value,
   } = req.body
 
-  if (!origin || !destination) {
-    return res.status(400).send({
-      error_code: 'INVALID_DATA',
-      error_description:
-        'Os endereços de origem e de destino são obrigatórios.',
-    })
-  }
+  const validationError = validateRideBody(req.body)
 
-  if (!customer_id) {
-    return res.status(400).send({
-      error_code: 'INVALID_DATA',
-      error_description: 'ID do usuário é obrigatório.',
-    })
-  }
-
-  if (origin === destination) {
-    return res.status(400).send({
-      error_code: 'INVALID_DATA',
-      error_description:
-        'Os endereços de origem e de destino não podem ser iguais.',
-    })
+  if (validationError) {
+    return sendErrorResponse(res, 400, 'INVALID_DATA', validationError)
   }
 
   try {
-    await confirmRideService({
+    const prismaRideRepository = new PrismaRidesRepository()
+    const prismaDriversRepository = new PrismaDriversRepository()
+    const prismaUserRepository = new PrismaUsersRepository()
+
+    const confirmRideUseCase = new ConfirmRideUseCase(
+      prismaDriversRepository,
+      prismaUserRepository,
+      prismaRideRepository,
+    )
+    await confirmRideUseCase.execute({
       customer_id,
       origin,
       destination,
@@ -118,8 +105,21 @@ export async function confirmRide(
       success: true,
     })
   } catch (error) {
-    console.error(error)
-    return res.status(400).send({
+    if (error instanceof DriverNotFoundError) {
+      return res.status(404).send({
+        error_code: 'DRIVER_NOT_FOUND',
+        error_description: error.message,
+      })
+    }
+
+    if (error instanceof InvalidDistanceError) {
+      return res.status(406).send({
+        error_code: 'INVALID_DISTANCE',
+        error_description: error.message,
+      })
+    }
+    console.log(error)
+    return res.status(500).send({
       error_code: 'CONFIRMATION_FAILED',
       error_description: 'Algo deu errado ao confirmar a corrida.',
     })
@@ -144,13 +144,33 @@ export async function getRides(
   }
 
   try {
-    const rides = await getRidesService(customer_id, driver_id)
+    const prismaRideRepository = new PrismaRidesRepository()
+    const prismaDriversRepository = new PrismaDriversRepository()
+
+    const getRidesUseCase = new GetRidesUseCase(
+      prismaDriversRepository,
+      prismaRideRepository,
+    )
+    const rides = await getRidesUseCase.execute(customer_id, driver_id)
 
     return res.status(200).send(rides)
   } catch (error) {
-    console.error(error)
-    return res.status(400).send({
-      error_code: 'CONFIRMATION_FAILED',
+    if (error instanceof InvalidDriverError) {
+      return res.status(400).send({
+        error_code: 'INVALID_DRIVER',
+        error_description: error.message,
+      })
+    }
+
+    if (error instanceof NoRidesFoundError) {
+      return res.status(404).send({
+        error_code: 'NO_RIDES_FOUND',
+        error_description: error.message,
+      })
+    }
+
+    return res.status(500).send({
+      error_code: 'SEARCH_FAILED',
       error_description: 'Algo deu errado ao buscar corridas.',
     })
   }

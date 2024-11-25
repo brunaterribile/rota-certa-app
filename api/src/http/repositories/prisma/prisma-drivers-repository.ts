@@ -1,7 +1,17 @@
 import { prisma } from '@/lib/prisma'
+import { Driver, Review } from '@prisma/client'
+import { DriversRepository } from '../drivers-repository'
 
-export class PrismaDriversRepository {
-  async findDrivers(distanceInKm: number) {
+export interface DriverWithReviews extends Driver {
+  id: number
+  name: string
+  car: string
+  price_per_km: number
+  reviews: Review[]
+}
+
+export class PrismaDriversRepository implements DriversRepository {
+  async findDrivers(distanceInKm: number): Promise<DriverWithReviews[]> {
     const drivers = await prisma.driver.findMany({
       where: {
         min_distance: {
@@ -19,7 +29,7 @@ export class PrismaDriversRepository {
     return drivers
   }
 
-  async findById(id: string) {
+  async findById(id: number): Promise<Driver | null> {
     const driver = await prisma.driver.findUnique({
       where: { id },
     })
