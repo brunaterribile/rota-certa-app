@@ -9,8 +9,8 @@ export function Home() {
                     <label htmlFor="customer_id">Id do usuário</label>
                     <input id="customer_id"/>
 
-                    <label htmlFor="orgin">Endereço de partida</label>
-                    <input id="orgin" type="text"/>
+                    <label htmlFor="origin">Endereço de partida</label>
+                    <input id="origin" type="text"/>
 
                     <label htmlFor="destination">Endereço de destino</label>
                     <input id="destination" type="text"/>

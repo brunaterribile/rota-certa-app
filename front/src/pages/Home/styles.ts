@@ -18,8 +18,6 @@ export const HomeContainer = styled.main`
     h2 {
         margin: 2rem 0;
     }
-
-    //background-color: cadetblue;
 `;
 
 export const FormContainer = styled.main`
