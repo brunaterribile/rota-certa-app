@@ -1,5 +1,6 @@
 import { api } from "../lib/axios";
 
-export async function confirmRide() {
-    await api.get('/ride/confirm')
+export async function getHistory(customer_id: string, driver_id?: string) {
+    const url = `/ride/${customer_id}${driver_id ? `?driver_id=${driver_id}` : ''}`;
+    return await api.get(url);
 }

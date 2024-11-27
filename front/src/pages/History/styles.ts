@@ -23,10 +23,10 @@ export const FormContainer = styled.main`
     font-size: 1.3rem;
     font-weight: bold;
 
-    input {
+    input, select {
         flex: 1;
         height: 2.5rem;
-        padding: 0.8rem;
+        padding: 0 0.8rem;
         border: 2px solid transparent;
         border-radius: 8px;
         outline: none;
