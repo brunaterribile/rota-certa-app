@@ -4,6 +4,7 @@ import { useState } from "react";
 import { confirmRide, ConfirmRideBody } from "../../api/confirm-ride";
 import { toast } from "sonner";
 import { useCustomer } from "../../contexts/CustomerContext";
+import { AxiosError } from "axios";
 
 type Driver = {
     id: number;
@@ -57,7 +58,11 @@ export function RideOptions() {
                 toast.error("Erro ao confirmar a viagem!");
             }
         } catch (error) {
-            toast.error("Erro ao confirmar a viagem!");
+            if (error instanceof AxiosError && error?.response?.data?.error_description) {
+                toast.error(error.response.data.error_description);
+            } else {
+                toast.error('Ocorreu um erro inesperado');
+            }
         } finally {
             setLoading(false);
         }

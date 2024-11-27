@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { formatDateTime } from "../../utils/format-datetime";
 import { formatDuration } from "../../utils/format-duration";
+import { AxiosError } from "axios";
 
 type RequestHistoryForm = {
     customer_id: string;
@@ -34,7 +35,11 @@ export function History() {
             const response = await getHistory(data.customer_id, data.driver_id)
             setRides(response.data.rides)
         } catch (error) {
-            toast.error('error')
+            if (error instanceof AxiosError && error?.response?.data?.error_description) {
+                toast.error(error.response.data.error_description);
+            } else {
+                toast.error('Ocorreu um erro inesperado');
+            }
         }
     }
 

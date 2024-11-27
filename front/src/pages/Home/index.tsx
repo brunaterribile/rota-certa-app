@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { requestRide } from "../../api/request-ride";
 import { useNavigate } from "react-router-dom";
 import { useCustomer } from "../../contexts/CustomerContext";
+import { AxiosError } from 'axios';
 
 type RequestRideForm = {
     customer_id: string;
@@ -24,7 +25,11 @@ export function Home() {
             setDestination(data.destination)
             navigate('/ride-options', { state: { ...response, origin: data.origin, destination: data.destination } })
         } catch (error) {
-            toast.error('error')
+            if (error instanceof AxiosError && error?.response?.data?.error_description) {
+                toast.error(error.response.data.error_description);
+            } else {
+                toast.error('Ocorreu um erro inesperado');
+            }
         }
     }
 
