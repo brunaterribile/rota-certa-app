@@ -9,4 +9,9 @@ export async function appRoutes(app: FastifyInstance) {
   app.post('/ride/estimate', estimateRide)
   app.patch('/ride/confirm', confirmRide)
   app.get('/ride/:customer_id', getRides)
+  app.get('/config', async () => {
+    return {
+      googleMapsAPIKey: process.env.GOOGLE_API_KEY,
+    }
+  })
 }

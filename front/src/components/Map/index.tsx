@@ -7,9 +7,10 @@ type StaticMapProps = {
 
 export const StaticMap = ({ routeResponse }: StaticMapProps) => {
   const [googleMapsAPIKey, setGoogleMapsAPIKey] = useState<string | null>(null);
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8080';
 
   useEffect(() => {
-    fetch("http://rota_certa_backend:8080/config") // URL do backend
+    fetch(`${backendUrl}/config`)
       .then((response) => response.json())
       .then((data) => setGoogleMapsAPIKey(data.googleMapsAPIKey))
       .catch((error) => console.error("Erro ao carregar a chave:", error));

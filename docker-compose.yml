@@ -22,6 +22,8 @@ services:
       context: ./front
     container_name: rota_certa_frontend
     restart: unless-stopped
+    environment:
+      REACT_APP_BACKEND_URL: "http://rota_certa_backend:8080"
     env_file:
       - .env
     ports:
