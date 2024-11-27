@@ -7,6 +7,7 @@ export interface RequestRideBody {
 }
 
 interface RequestRideResponse {
+  customer_id: string;
   origin: {
     latitude: number;
     longitude: number;
