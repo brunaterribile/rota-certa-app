@@ -6,6 +6,26 @@ import { toast } from "sonner";
 import { useCustomer } from "../../contexts/CustomerContext";
 import { AxiosError } from "axios";
 import { renderStars } from "../../utils/render-stars";
+import { StaticMap } from "../../components/Map";
+
+interface LatLng {
+    latitude: number;
+    longitude: number;
+}
+
+interface Polyline {
+    encodedPolyline: string;
+}
+
+interface Leg {
+    startLocation: { latLng: LatLng };
+    endLocation: { latLng: LatLng };
+}
+
+export interface RouteResponse {
+    legs: Leg[];
+    polyline: Polyline;
+}
 
 type Driver = {
     id: number;
@@ -25,13 +45,14 @@ type LocationState = {
     destination: string;
     distance: number;
     duration: string;
+    routeResponse: RouteResponse;
 };
 
 export function RideOptions() {
     const location = useLocation()  
     const navigate = useNavigate()
     const { origin, destination, customer_id } = useCustomer();
-    const { options, distance, duration } = location.state as LocationState
+    const { options, distance, duration, routeResponse } = location.state as LocationState
 
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -110,7 +131,11 @@ export function RideOptions() {
                         </tbody>
                     </table>
                 </DriversList>
-                <MapBox></MapBox>
+                <MapBox>
+                    {routeResponse && (
+                        <StaticMap routeResponse={routeResponse}/>
+                    )}
+                </MapBox>
             </OptionsBox>
         </OptionsContainer>
     )

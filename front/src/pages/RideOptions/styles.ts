@@ -18,7 +18,6 @@ export const OptionsBox = styled.div`
 `;
 
 export const DriversList = styled.div`
-    //background-color: blue;
     flex: 1;
 
     table {
@@ -62,7 +61,6 @@ export const DriversList = styled.div`
 export const MapBox = styled.div`
     height: 500px;
     width: 600px;
-    background-color: pink;
 `;
 
 export const RequestDriverButton = styled.button`
