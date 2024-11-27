@@ -124,7 +124,7 @@ export function RideOptions() {
                                         onClick={() => handleConfirmRide(option)} 
                                         disabled={loading}
                                     >
-                                        {loading ? "Confirmando..." : "Escolher"}
+                                        {loading ? "..." : "Escolher"}
                                     </RequestDriverButton></td>
                                 </tr>
                             ))}

@@ -10,3 +10,9 @@ app.register(cors, {
 })
 
 app.register(appRoutes)
+
+app.get('/config', async () => {
+  return {
+    googleMapsAPIKey: process.env.GOOGLE_API_KEY,
+  }
+})

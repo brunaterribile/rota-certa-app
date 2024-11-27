@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { RouteResponse } from "../../pages/RideOptions";
 
 type StaticMapProps = {
@@ -5,7 +6,18 @@ type StaticMapProps = {
 };
 
 export const StaticMap = ({ routeResponse }: StaticMapProps) => {
-  const googleMapsAPIKey = process.env.GOOGLE_API_KEY
+  const [googleMapsAPIKey, setGoogleMapsAPIKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("http://rota_certa_backend:8080/config") // URL do backend
+      .then((response) => response.json())
+      .then((data) => setGoogleMapsAPIKey(data.googleMapsAPIKey))
+      .catch((error) => console.error("Erro ao carregar a chave:", error));
+  }, []);
+
+  if (!googleMapsAPIKey) {
+    return <div>Carregando mapa...</div>;
+  }
 
   const startLocation = routeResponse.legs[0].startLocation.latLng;
   const endLocation = routeResponse.legs[0].endLocation.latLng;

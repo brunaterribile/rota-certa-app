@@ -7,18 +7,15 @@ services:
     container_name: rota_certa_backend
     restart: unless-stopped
     environment:
-      DATABASE_HOST: api-rotacerta-pg
-      DATABASE_PORT: 5432
-      DATABASE_USER: docker
-      DATABASE_PASSWORD: docker
-      DATABASE_NAME: api-rotacerta
+      DATABASE_URL: "postgresql://docker:docker@api-rotacerta-pg:5432/api-rotacerta"
     env_file:
       - .env
     ports:
       - "8080:8080"
+      - "5555:5555"
     depends_on:
       - api-rotacerta-pg
-    command: ["./wait-for-it.sh", "api-rotacerta-pg:5432", "--", "npm", "start"]
+    command: ["sh", "-c", "./wait-for-it.sh api-rotacerta-pg:5432 -- npm start"]
 
   rota_certa_frontend:
     build:
