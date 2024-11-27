@@ -5,6 +5,7 @@ import { confirmRide, ConfirmRideBody } from "../../api/confirm-ride";
 import { toast } from "sonner";
 import { useCustomer } from "../../contexts/CustomerContext";
 import { AxiosError } from "axios";
+import { renderStars } from "../../utils/render-stars";
 
 type Driver = {
     id: number;
@@ -53,7 +54,10 @@ export function RideOptions() {
         try {
             const response = await confirmRide(confirmData);
             if (response.success) {
-                navigate('/history');
+                toast.success("Corrida registrada com sucesso!");
+                setTimeout(() => {
+                    navigate('/history');
+                }, 2000); 
             } else {
                 toast.error("Erro ao confirmar a viagem!");
             }
@@ -90,7 +94,10 @@ export function RideOptions() {
                                     <td>{option.name}</td>
                                     <td>{option.description}</td>
                                     <td>{option.vehicle}</td>
-                                    <td>{option.review.rating}/5 "{option.review.comment}"</td>
+                                    <td>
+                                        {renderStars(option.review.rating)}
+                                        <span> "{option.review.comment}"</span>
+                                    </td>
                                     <td>R$ {option.value}</td>
                                     <td><RequestDriverButton
                                         onClick={() => handleConfirmRide(option)} 
