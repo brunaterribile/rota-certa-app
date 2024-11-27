@@ -51,7 +51,7 @@ export function History() {
                     <label htmlFor="customer_id">Id do usuário</label>
                     <input 
                         id="customer_id"
-                        {...register("customer_id", { required: "O ID do usuário é obrigatório" })} 
+                        {...register("customer_id")} 
                     />
 
                     <label htmlFor="driver">Motorista</label>
