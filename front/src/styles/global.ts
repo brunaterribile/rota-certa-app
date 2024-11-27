@@ -23,4 +23,14 @@ export const GlobalStyle = createGlobalStyle`
         font-weight: 400;
         font-size: 1rem;
     }
+
+    .custom-toast {
+        font-size: 16px;
+        padding: 16px;
+        border-radius: 8px;
+        min-width: 300px;
+        background-color: ${props => props.theme['gray-800']};
+        color: ${props => props.theme['gray-100']};
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
 `;
