@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  rota_certa_backend:
+    build:
+      context: ./api
+    container_name: rota_certa_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_HOST: api-rotacerta-pg
+      DATABASE_PORT: 5432
+      DATABASE_USER: docker
+      DATABASE_PASSWORD: docker
+      DATABASE_NAME: api-rotacerta
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api-rotacerta-pg
+    command: ["./wait-for-it.sh", "api-rotacerta-pg:5432", "--", "npm", "start"]
+
+  rota_certa_frontend:
+    build:
+      context: ./front
+    container_name: rota_certa_frontend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+    depends_on:
+      - rota_certa_backend
+
+  api-rotacerta-pg:
+    container_name: api-rotacerta-pg
+    image: bitnami/postgresql
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: api-rotacerta
