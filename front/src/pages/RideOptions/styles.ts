@@ -45,6 +45,7 @@ export const DriversList = styled.div`
         }
 
         td {
+            min-width: 100px;
             background-color: ${(props) => props.theme['gray-700']};
             border-top: 4px solid ${(props) => props.theme['gray-800']};
             padding: 1rem;
@@ -60,7 +61,7 @@ export const DriversList = styled.div`
 
 export const MapBox = styled.div`
     height: 500px;
-    width: 700px;
+    width: 600px;
     background-color: pink;
 `;
 

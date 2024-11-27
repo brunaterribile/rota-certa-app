@@ -2,6 +2,8 @@ import { FormContainer, HomeContainer, RequestRideButton } from "./styles";
 import { useForm } from'react-hook-form'
 import { toast } from 'sonner'
 import { requestRide } from "../../api/request-ride";
+import { useNavigate } from "react-router-dom";
+import { useCustomer } from "../../contexts/CustomerContext";
 
 type RequestRideForm = {
     customer_id: string;
@@ -11,11 +13,16 @@ type RequestRideForm = {
 
 export function Home() {
     const { register, handleSubmit, formState: { isSubmitting} } = useForm<RequestRideForm>()
+    const { setCustomerId, setOrigin, setDestination } = useCustomer();
+    const navigate = useNavigate();
 
     async function handleForm(data: RequestRideForm) {
-        console.log(data)
         try {
-            await requestRide(data)
+            const response = await requestRide(data)
+            setCustomerId(data.customer_id)
+            setOrigin(data.origin)
+            setDestination(data.destination)
+            navigate('/ride-options', { state: { ...response, origin: data.origin, destination: data.destination } })
         } catch (error) {
             toast.error('error')
         }

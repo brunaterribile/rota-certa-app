@@ -1,9 +1,9 @@
 import { api } from "../lib/axios";
 
 export interface ConfirmRideBody {
-    customer_id: string;
-    origin: string;
-    destination: string;
+    customer_id: string | null;
+    origin: string | null;
+    destination: string | null;
     distance: number;
     duration: string;
     driver: {
