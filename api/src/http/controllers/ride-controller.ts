@@ -175,3 +175,59 @@ export async function getRides(
     })
   }
 }
+
+function calculateZoomLevel(viewport: {
+  high: { latitude: number; longitude: number }
+  low: { latitude: number; longitude: number }
+}): number {
+  const WORLD_DIM = { height: 256, width: 256 }
+  const ZOOM_MAX = 21
+
+  function latRad(lat: number) {
+    const sin = Math.sin((lat * Math.PI) / 180)
+    const radX2 = Math.log((1 + sin) / (1 - sin)) / 2
+    return Math.max(Math.min(radX2, Math.PI), -Math.PI) / 2
+  }
+
+  function zoom(mapPx: number, worldPx: number, fraction: number) {
+    return Math.floor(Math.log(mapPx / worldPx / fraction) / Math.LN2)
+  }
+
+  const latFraction =
+    (latRad(viewport.high.latitude) - latRad(viewport.low.latitude)) / Math.PI
+  const lngDiff = viewport.high.longitude - viewport.low.longitude
+  const lngFraction = (lngDiff < 0 ? lngDiff + 360 : lngDiff) / 360
+
+  const latZoom = zoom(WORLD_DIM.height, 256, latFraction)
+  const lngZoom = zoom(WORLD_DIM.width, 256, lngFraction)
+
+  return Math.min(latZoom, lngZoom, ZOOM_MAX)
+}
+
+export async function getStaticMap(
+  req: FastifyRequest<{
+    Querystring: {
+      startLat: number
+      startLng: number
+      endLat: number
+      endLng: number
+      polyline: string
+      viewport: string
+    }
+  }>,
+  res: FastifyReply,
+) {
+  const { startLat, startLng, endLat, endLng, polyline, viewport } = req.query
+  const apiKey = process.env.GOOGLE_API_KEY
+
+  if (!startLat || !startLng || !endLat || !endLng || !polyline || !viewport) {
+    return res.status(400).send({ error: 'Invalid parameters' })
+  }
+
+  const viewportObj = JSON.parse(viewport)
+  const zoom = calculateZoomLevel(viewportObj)
+
+  const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?zoom=${zoom}&size=600x400&markers=color:blue%7Clabel:A%7C${startLat},${startLng}&markers=color:red%7Clabel:B%7C${endLat},${endLng}&path=enc:${encodeURIComponent(polyline)}&key=${apiKey}`
+
+  return res.send({ mapUrl })
+}

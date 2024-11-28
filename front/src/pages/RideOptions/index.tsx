@@ -13,18 +13,23 @@ interface LatLng {
     longitude: number;
 }
 
-interface Polyline {
-    encodedPolyline: string;
-}
-
 interface Leg {
     startLocation: { latLng: LatLng };
     endLocation: { latLng: LatLng };
+    distanceMeters: number;
 }
+
+interface Viewport {
+    high: { latitude: number; longitude: number };
+    low: { latitude: number; longitude: number };
+  }
 
 export interface RouteResponse {
     legs: Leg[];
-    polyline: Polyline;
+    polyline: {
+      encodedPolyline: string;
+    };
+    viewport: Viewport;
 }
 
 type Driver = {

@@ -2,37 +2,37 @@ import { useEffect, useState } from "react";
 import { RouteResponse } from "../../pages/RideOptions";
 
 type StaticMapProps = {
-  routeResponse: RouteResponse;
+  routeResponse: RouteResponse
 };
 
 export const StaticMap = ({ routeResponse }: StaticMapProps) => {
-  const [googleMapsAPIKey, setGoogleMapsAPIKey] = useState<string | null>(null);
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8080';
+  const [mapUrl, setMapUrl] = useState<string | null>(null)
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8080'
 
   useEffect(() => {
-    fetch(`${backendUrl}/config`)
+    const startLocation = routeResponse.legs[0].startLocation.latLng
+    const endLocation = routeResponse.legs[0].endLocation.latLng
+    const polyline = encodeURIComponent(routeResponse.polyline.encodedPolyline)
+    const viewport = JSON.stringify(routeResponse.viewport)
+
+    if (!startLocation || !endLocation || !polyline || !viewport) {
+      console.error("Invalid route response data")
+      return
+    }
+
+    fetch(`${backendUrl}/static-map?startLat=${startLocation.latitude}&startLng=${startLocation.longitude}&endLat=${endLocation.latitude}&endLng=${endLocation.longitude}&polyline=${polyline}&viewport=${viewport}`)
       .then((response) => response.json())
-      .then((data) => setGoogleMapsAPIKey(data.googleMapsAPIKey))
-      .catch((error) => console.error("Erro ao carregar a chave:", error));
-  }, []);
+      .then((data) => setMapUrl(data.mapUrl))
+      .catch((error) => console.error("Erro ao carregar o mapa:", error))
+  }, [routeResponse])
 
-  if (!googleMapsAPIKey) {
-    return <div>Carregando mapa...</div>;
+  if (!mapUrl) {
+    return <div>Carregando mapa...</div>
   }
-
-  const startLocation = routeResponse.legs[0].startLocation.latLng;
-  const endLocation = routeResponse.legs[0].endLocation.latLng;
-  const polyline = encodeURIComponent(routeResponse.polyline.encodedPolyline);
-
-  const centerLat = (startLocation.latitude + endLocation.latitude) / 2;
-  const centerLng = (startLocation.longitude + endLocation.longitude) / 2;
-
-  const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLng}&zoom=12&size=600x400&markers=color:blue%7Clabel:A%7C${startLocation.latitude},${startLocation.longitude}&markers=color:red%7Clabel:B%7C${endLocation.latitude},${endLocation.longitude}&path=enc:${polyline}&key=${googleMapsAPIKey}`;
 
   return (
     <div>
       <img src={mapUrl} alt="Mapa Estático com Rota" />
     </div>
-  );
-};
- 
+  )
+}
