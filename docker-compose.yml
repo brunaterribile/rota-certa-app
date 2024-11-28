@@ -15,7 +15,7 @@ services:
       - "5555:5555"
     depends_on:
       - api-rotacerta-pg
-    command: ["sh", "-c", "./wait-for-it.sh api-rotacerta-pg:5432 -- npm start"]
+    command: ["sh", "-c", "./wait-for-it.sh api-rotacerta-pg:5432 -- npx prisma migrate deploy && npm run seed && npm start"]
 
   rota_certa_frontend:
     build:
@@ -32,12 +32,12 @@ services:
       - rota_certa_backend
 
   api-rotacerta-pg:
+    image: postgres:latest
     container_name: api-rotacerta-pg
-    image: bitnami/postgresql
     restart: unless-stopped
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: docker
       POSTGRES_PASSWORD: docker
       POSTGRES_DB: api-rotacerta
+    ports:
+      - "5432:5432"
