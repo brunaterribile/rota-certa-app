@@ -24,6 +24,9 @@ A aplicação possui as seguintes funcionalidades principais:
 
 ---
 
+![Estrutura geral da aplicação](https://github.com/user-attachments/assets/12b41ae4-32fd-47e2-9181-13bfd4b009d8)
+
+
 ## **Tecnologias Utilizadas**  
 
 ### **Backend**  
