@@ -22,11 +22,10 @@ A aplicação possui as seguintes funcionalidades principais:
 4. **Histórico de viagens:**  
    - Exibição das viagens anteriores do usuário com os detalhes da viagem (motorista, data e hora, distâcia, duração e valor total).  
 
----
-## **Estrutura geral da aplicação **  
+
+## **Estrutura geral da aplicação**  
 
 ![Estrutura geral da aplicação](https://github.com/user-attachments/assets/12b41ae4-32fd-47e2-9181-13bfd4b009d8)
----
 
 ## **Tecnologias Utilizadas**  
 
