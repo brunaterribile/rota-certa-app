@@ -62,5 +62,5 @@ A aplicação possui as seguintes funcionalidades principais:
 ### **Iniciar o Projeto com Docker**
 1. Construa e execute o projeto usando o comando: docker compose up --build
 2. O servidor backend estará disponível em: http://localhost:8080
-3. O frontend estará disponível em: http://localhost:80
+3. O frontend estará disponível em: http://localhost:3000
 

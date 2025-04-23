@@ -3,6 +3,12 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
+  // Limpa todas as tabelas
+  await prisma.review.deleteMany()
+  await prisma.ride.deleteMany()
+  await prisma.driver.deleteMany()
+  await prisma.user.deleteMany()
+
   await prisma.driver.createMany({
     data: [
       {
@@ -61,7 +67,7 @@ async function main() {
     ],
   })
 
-  console.log('Seed finalizado: motoristas criados!')
+  console.log('Seed finalizado: dados criados!')
 }
 
 main()

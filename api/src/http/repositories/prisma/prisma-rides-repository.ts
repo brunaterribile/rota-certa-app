@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '../../../lib/prisma'
 import { Driver, Prisma, Ride } from '@prisma/client'
 import { RidesRepository } from '../rides-repository'
 

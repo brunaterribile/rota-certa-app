@@ -1,4 +1,3 @@
-version: '3'
 
 services:
   rota_certa_backend:
@@ -11,7 +10,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "8081:8081"
       - "5555:5555"
     depends_on:
       - api-rotacerta-pg
